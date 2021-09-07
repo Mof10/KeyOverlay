@@ -17,7 +17,7 @@ namespace KeyOverlay
         private readonly float _barSpeed = 0;
         private readonly float _ratioX = 0;
         private readonly float _ratioY = 0;
-        private readonly int _outlineThickness = 0;
+        private readonly uint _outlineThickness = 0;
         private readonly Color _backgroundColor = new Color(0, 0, 0, 255);
         private readonly Color _keyBackgroundColor = new Color(0, 0, 0, 0);
         private readonly Color _barColor = new Color(255, 255, 255, 150);
@@ -33,17 +33,10 @@ namespace KeyOverlay
         public AppWindow()
         {
             var config = ReadConfig();
-            var windowWidth = config["windowWidth"];
-            var windowHeight = config["windowHeight"];
-            _window = new RenderWindow(new VideoMode(uint.Parse(windowWidth!), uint.Parse(windowHeight!)),
-                "KeyOverlay", Styles.Default);
-
-            //calculate screen ratio relative to original program size for easy resizing
-            _ratioX = float.Parse(windowWidth) / 480f;
-            _ratioY = float.Parse(windowHeight) / 960f;
+            
 
             _barSpeed = float.Parse(config["barSpeed"], CultureInfo.InvariantCulture);
-            _outlineThickness = int.Parse(config["outlineThickness"]);
+            _outlineThickness = uint.Parse(config["outlineThickness"]);
             _backgroundColor = CreateItems.CreateColor(config["backgroundColor"]);
             _keyBackgroundColor = CreateItems.CreateColor(config["keyColor"]);
             _barColor = CreateItems.CreateColor(config["barColor"]);
@@ -59,7 +52,7 @@ namespace KeyOverlay
             }
 
             //create keys which will be used to create the squares and text
-            var keyAmount = int.Parse(config["keyAmount"]);
+            uint keyAmount = uint.Parse(config["keyAmount"]);
             for (var i = 1; i <= keyAmount; i++)
             {
                 try
@@ -80,11 +73,25 @@ namespace KeyOverlay
 
             }
 
+            Color outlineColor = CreateItems.CreateColor(config["borderColor"]);
+            uint marginBottom = uint.Parse(config["marginBottom"]);
+            uint keySize = uint.Parse(config["keySize"]);
+            uint margin = uint.Parse(config["margin"]);
+            //the window width should be enough to accommodate all of the keys + a left margin
+            //then one extra margin on the right
+            uint windowWidth = (keySize + margin) * keyAmount + margin;
+            uint windowHeight = 700;
+
+
+            _window = new RenderWindow(new VideoMode(windowWidth, windowHeight),
+                "KeyOverlay", Styles.Default);
+
+            //calculate screen ratio relative to original program size for easy resizing
+            _ratioX = windowWidth / 480f;
+            _ratioY = windowHeight / 960f;
+
             //create squares and add them to _staticDrawables list
-            var outlineColor = CreateItems.CreateColor(config["borderColor"]);
-            var marginBottom = int.Parse(config["marginBottom"]);
-            var keySize = int.Parse(config["keySize"]);
-            var margin = int.Parse(config["margin"]);
+            
             _squareList = CreateItems.CreateKeys(keyAmount, _outlineThickness, keySize, _ratioX, _ratioY, margin,
                 marginBottom,
                 _window, _keyBackgroundColor, outlineColor);
@@ -133,11 +140,11 @@ namespace KeyOverlay
             fadingTexture.Display();
             var fadingSprite = new Sprite(fadingTexture.Texture);
 
-
             while (_window.IsOpen)
             {
                 _window.Clear(_backgroundColor);
                 _window.DispatchEvents();
+
                 //if no keys are being held fill the square with bg color
                 foreach (var square in _squareList) square.FillColor = _keyBackgroundColor;
                 //if a key is being held, change the key bg and increment hold variable of key

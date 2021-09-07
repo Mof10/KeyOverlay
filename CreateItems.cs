@@ -11,7 +11,7 @@ namespace KeyOverlay
     {
         public static readonly Font _font = new Font(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Resources",
             "consolab.ttf")));
-        public static RectangleShape CreateBar(RectangleShape square, int outlineThickness, float barSpeed)
+        public static RectangleShape CreateBar(RectangleShape square, uint outlineThickness, float barSpeed)
         {
             var rect = new RectangleShape(new Vector2f(square.Size.X + outlineThickness * 2, barSpeed));
             rect.Position = new Vector2f(square.Position.X - outlineThickness,
@@ -20,8 +20,8 @@ namespace KeyOverlay
             return rect;
         }
 
-        public static List<RectangleShape> CreateKeys(int keyAmount, int outlineThickness, float size, float ratioX, float ratioY,
-            int margin, int marginBottom, RenderWindow window, Color backgroundColor, Color outlineColor)
+        public static List<RectangleShape> CreateKeys(uint keyAmount, uint outlineThickness, float size, float ratioX, float ratioY,
+            uint margin, uint marginBottom, RenderWindow window, Color backgroundColor, Color outlineColor)
         {
             var yPos = 900 * ratioY;
             var width = size + outlineThickness * 2;
